@@ -1,0 +1,153 @@
+#include <iostream>
+#include <vector>
+#include <string>
+
+using namespace std;
+
+// Design Pattern
+template <typename T>
+class Curs {
+private:
+    virtual T getInfoCurs() const = 0;
+};
+
+template <typename T>
+class CursMatematica : public Curs<T> {
+private:
+    T getInfoCurs() const override {
+        return "Curs de Matematica";
+    }
+};
+
+template <typename T>
+class CursLiteratura : public Curs<T> {
+private:
+    T getInfoCurs() const override {
+        return "Curs de Literatura";
+    }
+};
+
+// Design Pattern: Strategie
+template <typename T>
+class StrategieEvaluare {
+private:
+    virtual T calculeazaNota() const = 0;
+};
+
+template <typename T>
+class StrategiePromovare : public StrategieEvaluare<T> {
+private:
+    T calculeazaNota() const override {
+        return "Promovat/Respins";
+    }
+};
+
+template <typename T>
+class StrategieNotaNumerica : public StrategieEvaluare<T> {
+private:
+    T calculeazaNota() const override {
+        return "Nota Numerica";
+    }
+};
+
+// Class Template: Student
+template <typename T>
+class Student {
+private:
+    string nume;
+    T nota;
+
+public:
+    Student(const string& n, const T& g) : nume(n), nota(g) {}
+
+    T getNota() const {
+        return nota;
+    }
+
+    string getNume() const {
+        return nume;
+    }
+};
+
+// Class Template: SalaCursuri
+template <typename T>
+class SalaCursuri {
+private:
+    vector<Student<T>> studenti;
+
+public:
+    void adaugaStudent(const Student<T>& student) {
+        studenti.push_back(student);
+    }
+
+    void afiseazaInformatiiSala() const {
+        for (const auto& student : studenti) {
+            cout << "Student: " << student.getNume() << ", Nota: " << student.getNota() << endl;
+        }
+    }
+
+    const vector<Student<T>>& getStudenti() const {
+        return studenti;
+    }
+};
+
+// Functie Template: afiseazaInformatii
+template <typename T>
+void afiseazaInformatii(const T& informatie) {
+    cout << "Informatii: " << informatie << endl;
+}
+
+// Functie Template: mediaNote
+template <typename T>
+T mediaNote(const SalaCursuri<T>& sala) {
+    T suma = 0;
+    for (const auto& student : sala.getStudenti()) {
+        suma += student.getNota();
+    }
+    return suma / static_cast<T>(sala.getStudenti().size());
+}
+
+// Functie Template care verifica dc aTrecut
+template <typename T>
+bool aTrecut(const Student<T>& student) {
+    return student.getNota() >= 5;
+}
+
+// Template pentru un string
+template <>
+bool aTrecut(const Student<string>& student) {
+    return student.getNota() == "Promovat";
+}
+
+int main() {
+    // Instantiatierea  claselor template
+    Student<int> student1("Ion", 8);
+    Student<double> student2("Alexandra", 9.5);
+    Student<int> student3("George", 6);
+    Student<double> student4("Maria", 8.3);
+
+    SalaCursuri<int> cursMatematica;
+    cursMatematica.adaugaStudent(student1);
+    cursMatematica.adaugaStudent(student3);
+
+    SalaCursuri<double> cursLiteratura;
+    cursLiteratura.adaugaStudent(student2);
+    cursLiteratura.adaugaStudent(student4);
+
+    // Instantierii functiei template 'afiseazaInformatii'
+    afiseazaInformatii("Informatie despre cursuri.");
+    afiseazaInformatii(2024); // Using an integer as information
+
+    // Instantierii  functiei template 'mediaNote'
+    cout << "Media notelor pentru cursul de Matematica: " << mediaNote(cursMatematica) << endl;
+    cout << "Media notelor pentru cursul de Literatura: " << mediaNote(cursLiteratura) << endl;
+
+    cout << "Studentul Ion a trecut? " << (aTrecut(student1) ? "Da" : "Nu") << endl;
+    cout << "Studentul Alexandra a trecut? " << (aTrecut(student2) ? "Da" : "Nu") << endl;
+
+    Student<string> studentString("Vlad", "Promovat");
+    cout << "Studentul Vlad a trecut? " << (aTrecut(studentString) ? "Da" : "Nu") << endl;
+
+    return 0;
+}
+
